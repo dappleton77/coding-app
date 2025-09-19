@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Inpatient E/M Coding Helper</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            max-width: 900px;
+            margin: auto;
+            padding: 20px;
+            background-color: #f4f7fa;
+            color: #333;
+        }
+
+        h1, h2, h3 {
+            color: #2c3e50;
+        }
+
+        .step {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .step.active {
+            display: block;
+        }
+
+        label, input, select {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        input[type="radio"], input[type="checkbox"] {
+            display: inline;
+            margin-right: 10px;
+        }
+
+        button {
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 10px;
+        }
+
+        button:hover {
+            background-color: #219653;
+        }
+
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e8f5e9;
+            border-left: 5px solid #27ae60;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .examples {
+            font-size: 0.9em;
+            color: #555;
+            margin-left: 20px;
+        }
+
+        footer {
+            margin-top: 40px;
+            text-align: center;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+    <h1>Inpatient E/M Coding Helper for Levels 1-3</h1>
+    <p>This tool guides you through assessing MDM for initial (99221-99223) or subsequent (99231-99233) inpatient visits. Click through the steps.</p>
+    
+    <div id="step1" class="step active">
+        <h2>Step 1: Visit Type</h2>
+        <label>Select the type of visit:</label>
+        <select id="visitType">
+            <option value="initial">Initial (99221-99223)</option>
+            <option value="subsequent">Subsequent (99231-99233)</option>
+        </select>
+        <button onclick="nextStep(1)">Next</button>
+    </div>
+    
+    <div id="step2" class="step">
+        <h2>Step 2: Number and Complexity of Problems Addressed</h2>
+        <p>Select the option that best matches your encounter. Examples are provided for each level.</p>
+        <input type="radio" name="problems" value="low" id="problemsLow">
+        <label for="problemsLow">Low Level</label>
+        <div class="examples">
+            - 1 self-limited or minor problem<br>
+            - Or 2+ self-limited/minor problems<br>
+            - Or 1 stable chronic illness (e.g., stable hypertension)<br>
+            - Or 1 acute, uncomplicated illness/injury (e.g., simple chest pain resolved with minimal intervention)
+        </div>
+        
+        <input type="radio" name="problems" value="moderate" id="problemsModerate">
+        <label for="problemsModerate">Moderate Level</label>
+        <div class="examples">
+            - 1+ chronic illnesses with exacerbation/progression/side effects (e.g., heart failure flare-up requiring adjustment)<br>
+            - Or 2+ stable chronic illnesses (e.g., CAD and atrial fibrillation, both controlled)<br>
+            - Or 1 undiagnosed new problem with uncertain prognosis (e.g., new unexplained dyspnea)<br>
+            - Or 1 acute illness with systemic symptoms (e.g., pneumonia affecting breathing)<br>
+            - Or 1 acute complicated injury (e.g., fall with rib fracture in anticoagulated patient)
+        </div>
+        
+        <input type="radio" name="problems" value="high" id="problemsHigh">
+        <label for="problemsHigh">High Level</label>
+        <div class="examples">
+            - 1+ chronic illnesses with severe exacerbation/progression/side effects (e.g., decompensated heart failure with pulmonary edema)<br>
+            - Or 1 acute/chronic illness/injury threatening life or function (e.g., STEMI, severe arrhythmia causing shock)
+        </div>
+        
+        <button onclick="prevStep(2)">Back</button>
+        <button id="next2" onclick="nextStep(2)" disabled>Next</button>
+    </div>
+    
+    <div id="step3" class="step">
+        <h2>Step 3: Amount and/or Complexity of Data Reviewed and Analyzed</h2>
+        <p>Check all that apply. The level will be determined based on categories met.</p>
+        
+        <h3>Category 1: Tests, Notes, and Historian</h3>
+        <input type="checkbox" id="dataReviewExternal"> Review of external notes from unique source<br>
+        <input type="checkbox" id="dataReviewTests"> Review of unique test results<br>
+        <input type="checkbox" id="dataOrderTests"> Ordering of unique tests<br>
+        <input type="checkbox" id="dataHistorian"> Assessment requiring independent historian (e.g., family input)<br>
+        
+        <h3>Category 2: Independent Interpretation</h3>
+        <input type="checkbox" id="dataInterpretation"> Independent interpretation of tests not separately reported (e.g., personally reviewing an ECG)<br>
+        
+        <h3>Category 3: Discussion</h3>
+        <input type="checkbox" id="dataDiscussion"> Discussion with external provider/source (e.g., consulting pulmonologist)<br>
+        
+        <p><em>Levels:</em><br>
+        - Low: Minimal or limited (e.g., any 2 from Category 1)<br>
+        - Moderate: Meet 1 of 3 categories (e.g., any 3 from Category 1, or Category 2, or Category 3)<br>
+        - High: Meet 2 of 3 categories (e.g., 3+ from Category 1 plus another category)
+        </p>
+        
+        <button onclick="prevStep(3)">Back</button>
+        <button onclick="nextStep(3)">Next</button>
+    </div>
+    
+    <div id="step4" class="step">
+        <h2>Step 4: Risk of Complications and/or Morbidity or Mortality</h2>
+        <p>Select the option that best matches. Examples included.</p>
+        <input type="radio" name="risk" value="low" id="riskLow">
+        <label for="riskLow">Low Level</label>
+        <div class="examples">
+            - Minimal (e.g., rest, over-the-counter meds)<br>
+            - Or low (e.g., simple wound care)
+        </div>
+        
+        <input type="radio" name="risk" value="moderate" id="riskModerate">
+        <label for="riskModerate">Moderate Level</label>
+        <div class="examples">
+            - Prescription drug management (e.g., adjusting beta-blockers)<br>
+            - Decision for minor surgery with risk factors (e.g., pacemaker placement in frail patient)<br>
+            - Elective major surgery without risk factors (e.g., routine CABG planning)<br>
+            - Treatment limited by social determinants (e.g., homelessness affecting med adherence)
+        </div>
+        
+        <input type="radio" name="risk" value="high" id="riskHigh">
+        <label for="riskHigh">High Level</label>
+        <div class="examples">
+            - Drug therapy needing intensive monitoring (e.g., IV inotropes for cardiogenic shock)<br>
+            - Elective major surgery with risk factors (e.g., urgent valve replacement in high-risk patient)<br>
+            - Emergency major surgery (e.g., immediate PCI for acute MI)<br>
+            - Decision to hospitalize/escalate care (e.g., ICU transfer for unstable angina)<br>
+            - Decision not to resuscitate/de-escalate due to poor prognosis (e.g., end-stage cardiomyopathy)
+        </div>
+        
+        <button onclick="prevStep(4)">Back</button>
+        <button id="next4" onclick="nextStep(4)" disabled>Next</button>
+    </div>
+    
+    <div id="step5" class="step">
+        <h2>Step 5: Time Override (Optional)</h2>
+        <p>If using time instead of (or in addition to) MDM, enter total minutes spent on the date of encounter (includes chart review, counseling, etc.).</p>
+        <input type="number" id="time" placeholder="Total minutes (e.g., 60)" min="0">
+        <p><em>Thresholds:</em><br>
+        - Initial: Level 2 ≥55 min, Level 3 ≥75 min<br>
+        - Subsequent: Level 2 ≥35 min, Level 3 ≥50 min
+        </p>
+        
+        <button onclick="prevStep(5)">Back</button>
+        <button onclick="calculateLevel()">Calculate Level</button>
+    </div>
+    
+    <div id="result"></div>
+    
+    <footer>
+        <p>This is an educational tool only. Consult official guidelines and your billing team.</p>
+        <p>For full details: <a href="https://www.ama-assn.org/system/files/2023-e-m-descriptors-guidelines.pdf">AMA Guidelines</a> | <a href="https://www.aan.com/siteassets/home-page/tools-and-resources/practicing-neurologist--administrators/billing-and-coding/cpt--em/2023-cpt-revised-mdm-grid.pdf">MDM Grid</a></p>
+    </footer>
+    
+    <script>
+        function nextStep(current) {
+            if (current === 2 && !document.querySelector('input[name="problems"]:checked')) return;
+            if (current === 4 && !document.querySelector('input[name="risk"]:checked')) return;
+            
+            document.getElementById(`step${current}`).classList.remove('active');
+            document.getElementById(`step${current + 1}`).classList.add('active');
+        }
+
+        function prevStep(current) {
+            document.getElementById(`step${current}`).classList.remove('active');
+            document.getElementById(`step${current - 1}`).classList.add('active');
+        }
+
+        // Enable Next buttons when selections made
+        document.querySelectorAll('input[name="problems"]').forEach(input => {
+            input.addEventListener('change', () => document.getElementById('next2').disabled = false);
+        });
+        document.querySelectorAll('input[name="risk"]').forEach(input => {
+            input.addEventListener('change', () => document.getElementById('next4').disabled = false);
+        });
+
+        function calculateLevel() {
+            const visitType = document.getElementById('visitType').value;
+            const problems = document.querySelector('input[name="problems"]:checked')?.value || 'low';
+            const risk = document.querySelector('input[name="risk"]:checked')?.value || 'low';
+            
+            // Data level calculation
+            const cat1Checks = [
+                document.getElementById('dataReviewExternal').checked,
+                document.getElementById('dataReviewTests').checked,
+                document.getElementById('dataOrderTests').checked,
+                document.getElementById('dataHistorian').checked
+            ].filter(Boolean).length;
+            const cat2 = document.getElementById('dataInterpretation').checked;
+            const cat3 = document.getElementById('dataDiscussion').checked;
+            
+            let dataLevel = 'low';
+            const categoriesMet = (cat1Checks >= 3 ? 1 : 0) + (cat2 ? 1 : 0) + (cat3 ? 1 : 0);
+            
+            if (cat1Checks >= 2 || cat1Checks === 1) { // Limited for low
+                if (categoriesMet >= 1) dataLevel = 'moderate';
+                if (categoriesMet >= 2) dataLevel = 'high';
+            }
+            
+            const elements = [problems, dataLevel, risk];
+            const highCount = elements.filter(e => e === 'high').length;
+            const modOrHighCount = elements.filter(e => e === 'moderate' || e === 'high').length;
+            
+            let mdmLevel = 1;
+            if (modOrHighCount >= 2) mdmLevel = 2;
+            if (highCount >= 2) mdmLevel = 3;
+            
+            const time = parseInt(document.getElementById('time').value) || 0;
+            let timeLevel = 1;
+            if (visitType === 'initial') {
+                if (time >= 55) timeLevel = 2;
+                if (time >= 75) timeLevel = 3;
+            } else {
+                if (time >= 35) timeLevel = 2;
+                if (time >= 50) timeLevel = 3;
+            }
+            const finalLevel = Math.max(mdmLevel, timeLevel);
+            
+            const codes = visitType === 'initial' ? ['99221', '99222', '99223'] : ['99231', '99232', '99233'];
+            document.getElementById('result').innerHTML = `
+                <strong>Suggested Level: ${finalLevel} (Code: ${codes[finalLevel - 1]})</strong><br>
+                MDM Breakdown:<br>
+                - Problems: ${problems.charAt(0).toUpperCase() + problems.slice(1)}<br>
+                - Data: ${dataLevel.charAt(0).toUpperCase() + dataLevel.slice(1)} (Categories met: ${categoriesMet})<br>
+                - Risk: ${risk.charAt(0).toUpperCase() + risk.slice(1)}<br>
+                Use the higher of MDM (Level ${mdmLevel}) or Time (Level ${timeLevel}).
+            `;
+            
+            // Hide step5 and show result
+            document.getElementById('step5').classList.remove('active');
+            document.getElementById('result').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
