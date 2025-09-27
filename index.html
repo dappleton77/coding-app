@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E/M Coding Helper for Cardiology</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="container mx-auto p-6 max-w-3xl">
+        <h1 class="text-3xl font-bold text-center mb-6">E/M Coding Helper for Cardiology Visits</h1>
+        <p class="text-center mb-4">This tool guides you through assessing MDM for inpatient (99221-99223, 99231-99233) or outpatient (99202-99205, 99212-99215) cardiology visits.</p>
+
+        <!-- Step 1: Encounter Type -->
+        <div id="step1" class="step bg-white p-6 rounded-lg shadow-md mb-6">
+            <h2 class="text-2xl font-semibold mb-4">Step 1: Encounter Type</h2>
+            <p class="mb-4">Select the type of encounter:</p>
+            <select id="encounterType" class="w-full p-2 border rounded-md mb-4">
+                <option value="inpatient">Inpatient</option>
+                <option value="outpatient">Outpatient</option>
+            </select>
+            <button onclick="nextStep(1)" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">Next</button>
+        </div>
+
+        <!-- Step 2: Visit Type -->
+        <div id="step2" class="step hidden bg-white p-6 rounded-lg shadow-md mb-6">
+            <h2 class="text-2xl font-semibold mb-4">Step 2: Visit Type</h2>
+            <p class="mb-4">Select the type of visit:</p>
+            <select id="visitType" class="w-full p-2 border rounded-md mb-4">
+                <!-- Options populated dynamically -->
+            </select>
+            <button onclick="prevStep(2)" class="bg-gray-300 text-gray-700 px-4 py-2 rounded-md mr-2">Back</button>
+            <button onclick="nextStep(2)" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">Next</button>
+        </div>
+
+        <!-- Step 3: Problems Addressed -->
+        <div id="step3" class="step hidden bg-white p-6 rounded-lg shadow-md mb-6">
+            <h2 class="text-2xl font-semibold mb-4">Step 3: Number and Complexity of Problems Addressed</h2>
+            <p class="mb-4">Select the option that best matches your encounter. Examples are provided for each level.</p>
+            <div class="space-y-4">
+                <div class="flex items-center">
+                    <input type="radio" name="problems" value="low" class="mr-2">
+                    <label class="font-medium">Low Level</label>
+                </div>
+                <ul class="list-disc pl-8 text-sm">
+                    <li>1 self-limited or minor problem (e.g., palpitations resolved with reassurance)</li>
+                    <li>Or 2+ self-limited/minor problems</li>
+                    <li>Or 1 stable chronic illness (e.g., controlled hypertension)</li>
+                    <li>Or 1 acute, uncomplicated illness/injury (e.g., mild chest discomfort, likely musculoskeletal)</li>
+                </ul>
+                <div class="flex items-center">
+                    <input type="radio" name="problems" value="moderate" class="mr-2">
+                    <label class="font-medium">Moderate Level</label>
+                </div>
+                <ul class="list-disc pl-8 text-sm">
+                    <li>1+ chronic illnesses with exacerbation/progression/side effects (e.g., worsening angina requiring medication adjustment)</li>
+                    <li>Or 2+ stable chronic illnesses (e.g., hypertension and stable CAD)</li>
+                    <li>Or 1 undiagnosed new problem with uncertain prognosis (e.g., new exertional dyspnea)</li>
+                    <li>Or 1 acute illness with systemic symptoms (e.g., suspected pericarditis)</li>
+                    <li>Or 1 acute complicated injury (e.g., chest trauma in patient on anticoagulants)</li>
+                </ul>
+                <div class="flex items-center">
+                    <input type="radio" name="problems" value="high" class="mr-2">
+                    <label class="font-medium">High Level</label>
+                </div>
+                <ul class="list-disc pl-8 text-sm">
+                    <li>1+ chronic illnesses with severe exacerbation/progression/side effects (e.g., heart failure with worsening dyspnea requiring urgent intervention)</li>
+                    <li>Or 1 acute/chronic illness/injury threatening life or function (e.g., suspected acute coronary syndrome)</li>
+                </ul>
+            </div>
+            <p class="mt-4 text-red-500" id="problemsError" style="display: none;">Please select an option to proceed.</p>
+            <button onclick="prevStep(3)" class="bg-gray-300 text-gray-700 px-4 py-2 rounded-md mr-2">Back</button>
+            <button onclick="nextStep(3)" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">Next</button>
+        </div>
+
+        <!-- Step 4: Data Reviewed -->
+        <div id="step4" class="step hidden bg-white p-6 rounded-lg shadow-md mb-6">
+            <h2 class="text-2xl font-semibold mb-4">Step 4: Amount and/or Complexity of Data Reviewed and Analyzed</h2>
+            <p class="mb-4">Check all that apply. The level will be determined based on categories met.</p>
+            <div class="space-y-4">
+                <div>
+                    <label class="block font-medium">Category 1: Tests, Notes, and Historian</label>
+                    <ul class="list-disc pl-5 text-sm">
+                        <li><input type="checkbox" name="dataCat1" value="externalNotes"> Review of external notes from unique source</li>
+                        <li><input type="checkbox" name="dataCat1" value="testResults"> Review of unique test results (e.g., reviewing prior echocardiogram)</li>
+                        <li><input type="checkbox" name="dataCat1" value="orderTests"> Ordering of unique tests (e.g., order a stress test, order a coronary CTA with contrast)</li>
+                        <li><input type="checkbox" name="dataCat1" value="historian"> Assessment requiring independent historian (e.g., family input for confused patient; qualifies as Low level if selected alone)</li>
+                    </ul>
+                </div>
+                <div>
+                    <label class="block font-medium">Category 2: Independent Interpretation</label>
+                    <ul class="list-disc pl-5 text-sm">
+                        <li><input type="checkbox" name="dataCat2" value="interpretation"> Independent interpretation of tests not separately reported (e.g., personally reviewing an ECG or stress test)</li>
+                    </ul>
+                </div>
+                <div>
+                    <label class="block font-medium">Category 3: Discussion</label>
+                    <ul class="list-disc pl-5 text-sm">
+                        <li><input type="checkbox" name="dataCat3" value="discussion"> Discussion with external provider/source (e.g., consulting cardiothoracic surgeon)</li>
+                    </ul>
+                </div>
+                <div>
+                    <label class="block font-medium">Levels:</label>
+                    <ul class="list-disc pl-5 text-sm">
+                        <li>Low: Minimal or limited (e.g., any 2 from Category 1 or independent historian)</li>
+                        <li>Moderate: Moderate (e.g., any 3 from Category 1, or Category 2, or Category 3)</li>
+                        <li>High: Extensive (meet 2 of 3 categories)</li>
+                    </ul>
+                </div>
+            </div>
+            <button onclick="prevStep(4)" class="bg-gray-300 text-gray-700 px-4 py-2 rounded-md mr-2">Back</button>
+            <button onclick="nextStep(4)" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">Next</button>
+        </div>
+
+        <!-- Step 5: Risk -->
+        <div id="step5" class="step hidden bg-white p-6 rounded-lg shadow-md mb-6">
+            <h2 class="text-2xl font-semibold mb-4">Step 5: Risk of Complications and/or Morbidity or Mortality</h2>
+            <p class="mb-4">Select the option that best matches. Examples included.</p>
+            <div class="space-y-4">
+                <div class="flex items-center">
+                    <input type="radio" name="risk" value="low" class="mr-2">
+                    <label class="font-medium">Low Level</label>
+                </div>
+                <ul class="list-disc pl-8 text-sm">
+                    <li>Minimal (e.g., lifestyle modification, over-the-counter meds)</li>
+                    <li>Or low (e.g., prescribing low-dose aspirin)</li>
+                </ul>
+                <div class="flex items-center">
+                    <input type="radio" name="risk" value="moderate" class="mr-2">
+                    <label class="font-medium">Moderate Level</label>
+                </div>
+                <ul class="list-disc pl-8 text-sm">
+                    <li>Prescription drug management (e.g., initiating or adjusting statins or beta-blockers)</li>
+                    <li>Decision for minor procedure with risk factors (e.g., cardioversion in anticoagulated patient)</li>
+                    <li>Treatment limited by social determinants (e.g., non-compliance due to financial barriers)</li>
+                </ul>
+                <div class="flex items-center">
+                    <input type="radio" name="risk" value="high" class="mr-2">
+                    <label class="font-medium">High Level</label>
+                </div>
+                <ul class="list-disc pl-8 text-sm">
+                    <li>Drug therapy needing intensive monitoring (e.g., initiating amiodarone with close follow-up)</li>
+                    <li>Decision for major procedure with risk factors (e.g., planning cardiac catheterization in high-risk patient)</li>
+                    <li>Decision to refer for urgent hospitalization (e.g., suspected unstable angina requiring inpatient evaluation)</li>
+                </ul>
+            </div>
+            <p class="mt-4 text-red-500" id="riskError" style="display: none;">Please select an option to proceed.</p>
+            <button onclick="prevStep(5)" class="bg-gray-300 text-gray-700 px-4 py-2 rounded-md mr-2">Back</button>
+            <button onclick="nextStep(5)" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">Next</button>
+        </div>
+
+        <!-- Step 6: Time Override -->
+        <div id="step6" class="step hidden bg-white p-6 rounded-lg shadow-md mb-6">
+            <h2 class="text-2xl font-semibold mb-4">Step 6: Time Override (Optional)</h2>
+            <p class="mb-4">If using time instead of (or in addition to) MDM, enter total minutes spent on the date of encounter (includes chart review, counseling, etc.).</p>
+            <label class="block mb-2">Total minutes (e.g., 30):</label>
+            <input type="number" id="timeInput" class="w-full p-2 border rounded-md mb-4" min="0">
+            <p class
