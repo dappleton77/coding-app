@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E/M Coding Helper for Cardiology</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="container mx-auto p-6 max-w-3xl">
+        <h1 class="text-3xl font-bold text-center mb-6">E/M Coding Helper for Cardiology Visits</h1>
+        <p class="text-center mb-4">This tool guides you through assessing MDM for inpatient (99221-99223, 99231-99233) or outpatient (99202-99205, 99212-99215) cardiology visits.</p>
+
+        <!-- Step 1: Encounter Type -->
+        <div id="step1" class="step bg-white p-6 rounded-lg shadow-md mb-6">
+            <h2 class="text-2xl font-semibold mb-4">Step 1: Encounter Type</h2>
+            <p class="mb-4">Select the type of encounter:</p>
+            <select id="encounterType" class="w-full p-2 border rounded-md mb-4">
+                <option value="inpatient">Inpatient</option>
+                <option value="outpatient">Outpatient</option>
+            </select>
+            <button id="nextStep1" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">Next</button>
+        </div>
+
+        <!-- Step 2: Visit Type -->
+        <div id="step2" class="step hidden bg-white p-6 rounded-lg shadow-md mb-6">
+            <h2 class="text-2xl font-semibold mb-4">Step 2: Visit Type</h2>
+            <p class="mb-4">Select the type of visit:</p>
+            <select id="visitType" class="w-full p-2 border rounded-md mb-4">
+                <!-- Options populated dynamically -->
+            </select>
+            <button id="prevStep2" class="bg-gray-300 text-gray-700 px-4 py-2 rounded-md mr-2">Back</button>
+            <button id="nextStep2" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">Next</button>
+        </div>
+
+        <!-- Step 3: Problems Addressed -->
+        <div id="step3" class="step hidden bg-white p-6 rounded-lg shadow-md mb-6">
+            <h2 class="text-2xl font-semibold mb-4">Step 3: Number and Complexity of Problems Addressed</h2>
+            <p class="mb-4">Select the option that best matches your encounter. Examples are provided for each level.</p>
+            <div class="space-y-4">
+                <div class="flex items-center">
+                    <input type="radio" name="problems" value="low" class="mr-2">
+                    <label class="font-medium">Low Level</label>
+                </div>
+                <ul class="list-disc pl-8 text-sm">
+                    <li>1 self-limited or minor problem (e.g., palpitations resolved with reassurance)</li>
+                    <li>Or 2+ self-limited/minor problems</li>
+                    <li>Or 1 stable chronic illness (e.g., controlled hypertension)</li>
+                    <li>Or 1 acute, uncomplicated illness/injury (e.g., mild chest discomfort, likely musculoskeletal)</li>
+                </ul>
+                <div class="flex items-center">
+                    <input type="radio" name="problems" value="moderate" class="mr-2">
+                    <label class="font-medium">Moderate Level</label>
+                </div>
+                <ul class="list-disc pl-8 text-sm">
+                    <li>1+ chronic illnesses with exacerbation/progression/side effects (e.g., worsening angina requiring medication adjustment)</li>
+                    <li>Or 2+ stable chronic illnesses (e.g., hypertension and stable CAD)</li>
+                    <li>Or 1 undiagnosed new problem with uncertain prognosis (e.g., new exertional dyspnea)</li>
+                    <li>Or 1 acute illness with systemic symptoms (e.g., suspected pericarditis)</li>
+                    <li>Or 1 acute complicated injury (e.g., chest trauma in patient on anticoagulants)</li>
+                </ul>
+                <div class="flex items-center">
+                    <input type="radio" name="problems" value="high" class="mr-2">
+                    <label class="font-medium">High Level</label>
+                </div>
+                <ul class="list-disc pl-8 text-sm">
+                    <li>1+ chronic illnesses with severe exacerbation/progression/side effects (e.g., heart failure with worsening dyspnea requiring urgent intervention)</li>
+                    <li>Or 1 acute/chronic illness/injury threatening life or function (e.g., suspected acute coronary syndrome)</li>
+                </ul>
+            </div>
+            <p class="mt-4 text-red-500" id="problemsError" style="display: none;">Please select an option to proceed.</p>
+            <button id="prevStep3" class="bg-gray-300 text-gray-700 px-4 py-2 rounded-md mr-2">Back</button>
+            <button id="nextStep3" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">Next</button>
+        </div>
+
+        <!-- Step 4: Data Reviewed -->
+        <div id="step4" class="step hidden bg-white p-6 rounded-lg shadow-md mb-6">
+            <h2 class="text-2xl font-semibold mb-4">Step 4: Amount and/or Complexity of Data Reviewed and Analyzed</h2>
+            <p class="mb-4">Check all that apply. The level will be determined based on categories met.</p>
+            <div class="space-y-4">
+                <div>
+                    <label class="block font-medium">Category 1: Tests, Notes, and Historian</label>
+                    <ul class="list-disc pl-5 text-sm">
+                        <li><input type="checkbox" name="dataCat1" value="externalNotes"> Review of external notes from unique source</li>
+                        <li><input type="checkbox" name="dataCat1" value="testResults"> Review of unique test results (e.g., reviewing prior echocardiogram)</li>
+                        <li><input type="checkbox" name="dataCat1" value="orderTests"> Ordering of unique tests (e.g., order a stress test, order a coronary CTA with contrast)</li>
+                        <li><input type="checkbox" name="dataCat1" value="historian"> Assessment requiring independent historian (e.g., family input for confused patient; qualifies as Low level if selected alone)</li>
+                    </ul>
+                </div>
+                <div>
+                    <label class="block font-medium">Category 2: Independent Interpretation</label>
+                    <ul class="list-disc pl-5 text-sm">
+                        <li><input type="checkbox" name="dataCat2" value="interpretation"> Independent interpretation of tests not separately reported (e.g., personally reviewing an ECG or stress test)</li>
+                    </ul>
+                </div>
+                <div>
+                    <label class="block font-medium">Category 3: Discussion</label>
+                    <ul class="list-disc pl-5 text-sm">
+                        <li><input type="checkbox" name="dataCat3" value="discussion"> Discussion with external provider/source (e.g., consulting cardiothoracic surgeon)</li>
+                    </ul>
+                </div>
+                <div>
+                    <label class="block font-medium">Levels:</label>
+                    <ul class="list-disc pl-5 text-sm">
+                        <li>Low: Minimal or limited (e.g., any 2 from Category 1 or independent historian)</li>
+                        <li>Moderate: Moderate (e.g., any 3 from Category 1, or Category 2, or Category 3)</li>
+                        <li>High: Extensive (meet 2 of 3 categories)</li>
+                    </ul>
+                </div>
+            </div>
+            <button id="prevStep4" class="bg-gray-300 text-gray-700 px-4 py-2 rounded-md mr-2">Back</button>
+            <button id="nextStep4" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">Next</button>
+        </div>
+
+        <!-- Step 5: Risk -->
+        <div id="step5" class="step hidden bg-white p-6 rounded-lg shadow-md mb-6">
+            <h2 class="text-2xl font-semibold mb-4">Step 5: Risk of Complications and/or Morbidity or Mortality</h2>
+            <p class="mb-4">Select the option that best matches. Examples included.</p>
+            <div class="space-y-4">
+                <div class="flex items-center">
+                    <input type="radio" name="risk" value="low" class="mr-2">
+                    <label class="font-medium">Low Level</label>
+                </div>
+                <ul class="list-disc pl-8 text-sm">
+                    <li>Minimal (e.g., lifestyle modification, over-the-counter meds)</li>
+                    <li>Or low (e.g., prescribing low-dose aspirin)</li>
+                </ul>
+                <div class="flex items-center">
+                    <input type="radio" name="risk" value="moderate" class="mr-2">
+                    <label class="font-medium">Moderate Level</label>
+                </div>
+                <ul class="list-disc pl-8 text-sm">
+                    <li>Prescription drug management (e.g., initiating or adjusting statins or beta-blockers)</li>
+                    <li>Decision for minor procedure with risk factors (e.g., cardioversion in anticoagulated patient)</li>
+                    <li>Treatment limited by social determinants (e.g., non-compliance due to financial barriers)</li>
+                </ul>
+                <div class="flex items-center">
+                    <input type="radio" name="risk" value="high" class="mr-2">
+                    <label class="font-medium">High Level</label>
+                </div>
+                <ul class="list-disc pl-8 text-sm">
+                    <li>Drug therapy needing intensive monitoring (e.g., initiating amiodarone with close follow-up)</li>
+                    <li>Decision for major procedure with risk factors (e.g., planning cardiac catheterization in high-risk patient)</li>
+                    <li>Decision to refer for urgent hospitalization (e.g., suspected unstable angina requiring inpatient evaluation)</li>
+                </ul>
+            </div>
+            <p class="mt-4 text-red-500" id="riskError" style="display: none;">Please select an option to proceed.</p>
+            <button id="prevStep5" class="bg-gray-300 text-gray-700 px-4 py-2 rounded-md mr-2">Back</button>
+            <button id="nextStep5" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">Next</button>
+        </div>
+
+        <!-- Step 6: Time Override -->
+        <div id="step6" class="step hidden bg-white p-6 rounded-lg shadow-md mb-6">
+            <h2 class="text-2xl font-semibold mb-4">Step 6: Time Override (Optional)</h2>
+            <p class="mb-4">If using time instead of (or in addition to) MDM, enter total minutes spent on the date of encounter (includes chart review, counseling, etc.).</p>
+            <label class="block mb-2">Total minutes (e.g., 30):</label>
+            <input type="number" id="timeInput" class="w-full p-2 border rounded-md mb-4" min="0">
+            <p class="text-red-500" id="timeError" style="display: none;">Please enter a valid non-negative number.</p>
+            <div class="mb-4">
+                <label class="block font-medium">Thresholds:</label>
+                <ul id="timeThresholds" class="list-disc pl-5 text-sm">
+                    <!-- Populated dynamically -->
+                </ul>
+            </div>
+            <button id="prevStep6" class="bg-gray-300 text-gray-700 px-4 py-2 rounded-md mr-2">Back</button>
+            <button id="calculateLevelBtn" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">Calculate Level</button>
+        </div>
+
+        <!-- Results -->
+        <div id="results" class="step hidden bg-white p-6 rounded-lg shadow-md mb-6">
+            <h2 class="text-2xl font-semibold mb-4">Results</h2>
+            <p id="resultText" class="mb-4"></p>
+            <button id="resetBtn" class="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600">Reset and Start Over</button>
+        </div>
+
+        <!-- Footer -->
+        <div class="text-center mt-6 text-sm text-gray-600">
+            <p>This is an educational tool only. Consult official guidelines and your billing team.</p>
+            <p>For full details: <a href="https://www.ama-assn.org/practice-management/cpt/cpt-evaluation-and-management" class="text-blue-500 hover:underline">AMA Guidelines</a> | <a href="https://www.ama-assn.org/system/files/2023-04/cpt-office-visit-mdm-grid.pdf" class="text-blue-500 hover:underline">MDM Grid</a></p>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        let encounterType = '';
+        let visitType = '';
+        let problemsLevel = '';
+        let dataLevel = '';
+        let riskLevel = '';
+        let timeMinutes = 0;
+
+        function updateVisitTypeOptions() {
+            try {
+                console.log('Updating visit type options');
+                const visitTypeSelect = document.getElementById('visitType');
+                if (!visitTypeSelect) throw new Error('VisitType select element not found');
+                const encounterType = document.getElementById('encounterType').value;
+                visitTypeSelect.innerHTML = '';
+                if (encounterType === 'inpatient') {
+                    visitTypeSelect.innerHTML = `
+                        <option value="initial">Initial Inpatient (99221-99223)</option>
+                        <option value="subsequent">Subsequent Inpatient (99231-99233)</option>
+                    `;
+                } else {
+                    visitTypeSelect.innerHTML = `
+                        <option value="new">New Patient (99202-99205)</option>
+                        <option value="established">Established Patient (99212-99215)</option>
+                    `;
+                }
+                console.log('Visit type options updated for encounterType:', encounterType);
+                updateTimeThresholds();
+            } catch (error) {
+                console.error('Error in updateVisitTypeOptions:', error);
+            }
+        }
+
+        function updateTimeThresholds() {
+            try {
+                console.log('Updating time thresholds');
+                const thresholdsList = document.getElementById('timeThresholds');
+                if (!thresholdsList) throw new Error('TimeThresholds element not found');
+                const encounterType = document.getElementById('encounterType').value;
+                const visitType = document.getElementById('visitType').value || 'initial'; // Fallback to avoid undefined
+                if (encounterType === 'inpatient' && visitType === 'initial') {
+                    thresholdsList.innerHTML = `
+                        <li>Level 1 (99221): ≥40 min</li>
+                        <li>Level 2 (99222): ≥55 min</li>
+                        <li>Level 3 (99223): ≥75 min</li>
+                    `;
+                } else if (encounterType === 'inpatient' && visitType === 'subsequent') {
+                    thresholdsList.innerHTML = `
+                        <li>Level 1 (99231): ≥25 min</li>
+                        <li>Level 2 (99232): ≥35 min</li>
+                        <li>Level 3 (99233): ≥50 min</li>
+                    `;
+                } else if (encounterType === 'outpatient' && visitType === 'new') {
+                    thresholdsList.innerHTML = `
+                        <li>Level 2 (99202): ≥20 min</li>
+                        <li>Level 3 (99203): ≥30 min</li>
+                        <li>Level 4 (99204): ≥40 min</li>
+                        <li>Level 5 (99205): ≥60 min</li>
+                    `;
+                } else {
+                    thresholdsList.innerHTML = `
+                        <li>Level 2 (99212): ≥10 min</li>
+                        <li>Level 3 (99213): ≥20 min</li>
+                        <li>Level 4 (99214): ≥30 min</li>
+                        <li>Level 5 (99215): ≥40 min</li>
+                    `;
+                }
+                console.log('Time thresholds updated for visitType:', visitType);
+            } catch (error) {
+                console.error('Error in updateTimeThresholds:', error);
+            }
+        }
+
+        function nextStep(step) {
+            try {
+                console.log(`nextStep called with step ${step}`);
+                // Update state before validation
+                if (step === 1) {
+                    const encounterTypeSelect = document.getElementById('encounterType');
+                    if (!encounterTypeSelect) throw new Error('EncounterType select element not found');
+                    encounterType = encounterTypeSelect.value;
+                    updateVisitTypeOptions();
+                } else if (step === 2) {
+                    const visitTypeSelect = document.getElementById('visitType');
+                    if (!visitTypeSelect) throw new Error('VisitType select element not found');
+                    visitType = visitTypeSelect.value;
+                    updateTimeThresholds();
+                } else if (step === 3) {
+                    const problemsChecked = document.querySelector('input[name="problems"]:checked');
+                    if (problemsChecked) problemsLevel = problemsChecked.value;
+                    if (!problemsChecked) {
+                        const problemsError = document.getElementById('problemsError');
+                        if (problemsError) problemsError.style.display = 'block';
+                        console.log('Validation failed: No problems selected');
+                        return;
+                    }
+                } else if (step === 4) {
+                    calculateDataLevel();
+                } else if (step === 5) {
+                    const riskChecked = document.querySelector('input[name="risk"]:checked');
+                    if (riskChecked) riskLevel = riskChecked.value;
+                    if (!riskChecked) {
+                        const riskError = document.getElementById('riskError');
+                        if (riskError) riskError.style.display = 'block';
+                        console.log('Validation failed: No risk selected');
+                        return;
+                    }
+                }
+
+                const currentStepElement = document.getElementById(`step${step}`);
+                const nextStepElement = document.getElementById(`step${step + 1}`);
+                if (!currentStepElement || !nextStepElement) {
+                    throw new Error(`Step element not found: step${step} or step${step + 1}`);
+                }
+
+                currentStepElement.classList.add('hidden');
+                currentStep = step + 1;
+                nextStepElement.classList.remove('hidden');
+                console.log(`Advanced to step ${currentStep}`);
+            } catch (error) {
+                console.error('Error in nextStep:', error);
+            }
+        }
+
+        function prevStep(step) {
+            try {
+                console.log(`prevStep called with step ${step}`);
+                const currentStepElement = document.getElementById(`step${step}`);
+                const prevStepElement = document.getElementById(`step${step - 1}`);
+                if (!currentStepElement || !prevStepElement) {
+                    throw new Error(`Step element not found: step${step} or step${step - 1}`);
+                }
+                currentStepElement.classList.add('hidden');
+                currentStep = step - 1;
+                prevStepElement.classList.remove('hidden');
+                console.log(`Returned to step ${currentStep}`);
+                if (step === 2) {
+                    updateVisitTypeOptions();
+                }
+            } catch (error) {
+                console.error('Error in prevStep:', error);
+            }
+        }
+
+        function calculateDataLevel() {
+            try {
+                console.log('Calculating data level');
+                const cat1Count = document.querySelectorAll('input[name="dataCat1"]:checked').length;
+                const cat2Checked = document.querySelector('input[name="dataCat2"]:checked') !== null;
+                const cat3Checked = document.querySelector('input[name="dataCat3"]:checked') !== null;
+
+                let categoriesMet = 0;
+                if (cat1Count >= 3) categoriesMet++;
+                if (cat2Checked) categoriesMet++;
+                if (cat3Checked) categoriesMet++;
+
+                if (categoriesMet >= 2) {
+                    dataLevel = 'high';
+                } else if (cat1Count >= 3 || cat2Checked || cat3Checked) {
+                    dataLevel = 'moderate';
+                } else if (cat1Count >= 2 || cat1Count === 1) {
+                    dataLevel = 'low';
+                } else {
+                    dataLevel = 'minimal';
+                }
+                console.log(`Data level calculated: ${dataLevel}`);
+            } catch (error) {
+                console.error('Error in calculateDataLevel:', error);
+            }
+        }
+
+        function calculateLevel() {
+            try {
+                console.log('calculateLevel called');
+                timeMinutes = parseInt(document.getElementById('timeInput').value) || 0;
+                if (timeMinutes < 0) {
+                    const timeError = document.getElementById('timeError');
+                    if (timeError) timeError.style.display = 'block';
+                    console.log('Validation failed: Negative time input');
+                    return;
+                }
+
+                const currentStepElement = document.getElementById(`step${currentStep}`);
+                const resultsElement = document.getElementById('results');
+                if (!currentStepElement || !resultsElement) {
+                    throw new Error('Results or current step element not found');
+                }
+                currentStepElement.classList.add('hidden');
+                currentStep++;
+                resultsElement.classList.remove('hidden');
+
+                // Determine MDM level based on two out of three elements
+                let mdmLevel = 'minimal';
+                const levels = ['minimal', 'low', 'moderate', 'high'];
+                const levelCounts = {
+                    minimal: 0,
+                    low: 0,
+                    moderate: 0,
+                    high: 0
+                };
+                levelCounts[problemsLevel]++;
+                levelCounts[dataLevel]++;
+                levelCounts[riskLevel]++;
+
+                if (levelCounts.high >= 2) {
+                    mdmLevel = 'high';
+                } else if (levelCounts.moderate >= 2 || (levelCounts.high >= 1 && levelCounts.moderate >= 1)) {
+                    mdmLevel = 'moderate';
+                } else if (levelCounts.low >= 2 || (levelCounts.moderate >= 1 && levelCounts.low >= 1)) {
+                    mdmLevel = 'low';
+                }
+
+                let finalLevel = '';
+                if (encounterType === 'inpatient' && visitType === 'initial') {
+                    if (timeMinutes >= 75 || mdmLevel === 'high') finalLevel = '99223 (Level 3)';
+                    else if (timeMinutes >= 55 || mdmLevel === 'moderate') finalLevel = '99222 (Level 2)';
+                    else finalLevel = '99221 (Level 1)';
+                } else if (encounterType === 'inpatient' && visitType === 'subsequent') {
+                    if (timeMinutes >= 50 || mdmLevel === 'high') finalLevel = '99233 (Level 3)';
+                    else if (timeMinutes >= 35 || mdmLevel === 'moderate') finalLevel = '99232 (Level 2)';
+                    else finalLevel = '99231 (Level 1)';
+                } else if (encounterType === 'outpatient' && visitType === 'new') {
+                    if (timeMinutes >= 60 || mdmLevel === 'high') finalLevel = '99205 (Level 5)';
+                    else if (timeMinutes >= 40 || mdmLevel === 'moderate') finalLevel = '99204 (Level 4)';
+                    else if (timeMinutes >= 30 || mdmLevel === 'low') finalLevel = '99203 (Level 3)';
+                    else finalLevel = '99202 (Level 2)';
+                } else {
+                    if (timeMinutes >= 40 || mdmLevel === 'high') finalLevel = '99215 (Level 5)';
+                    else if (timeMinutes >= 30 || mdmLevel === 'moderate') finalLevel = '99214 (Level 4)';
+                    else if (timeMinutes >= 20 || mdmLevel === 'low') finalLevel = '99213 (Level 3)';
+                    else finalLevel = '99212 (Level 2)';
+                }
+
+                const resultText = document.getElementById('resultText');
+                if (!resultText) throw new Error('ResultText element not found');
+                resultText.innerHTML = `
+                    <strong>Encounter Type:</strong> ${encounterType.charAt(0).toUpperCase() + encounterType.slice(1)}<br>
+                    <strong>Visit Type:</strong> ${visitType === 'initial' ? 'Initial Inpatient' : visitType === 'subsequent' ? 'Subsequent Inpatient' : visitType === 'new' ? 'New Patient' : 'Established Patient'}<br>
+                    <strong>Problems Level:</strong> ${problemsLevel.charAt(0).toUpperCase() + problemsLevel.slice(1)}<br>
+                    <strong>Data Level:</strong> ${dataLevel.charAt(0).toUpperCase() + dataLevel.slice(1)}<br>
+                    <strong>Risk Level:</strong> ${riskLevel.charAt(0).toUpperCase() + riskLevel.slice(1)}<br>
+                    <strong>Time (if used):</strong> ${timeMinutes > 0 ? timeMinutes + ' minutes' : 'Not used'}<br>
+                    <strong>Final E/M Code:</strong> ${finalLevel}
+                `;
+                console.log(`Results displayed: ${finalLevel}`);
+            } catch (error) {
+                console.error('Error in calculateLevel:', error);
+            }
+        }
+
+        function reset() {
+            try {
+                console.log('reset called');
+                currentStep = 1;
+                encounterType = '';
+                visitType = '';
+                problemsLevel = '';
+                dataLevel = '';
+                riskLevel = '';
+                timeMinutes = 0;
+                const encounterTypeSelect = document.getElementById('encounterType');
+                const visitTypeSelect = document.getElementById('visitType');
+                const problemsInputs = document.querySelectorAll('input[name="problems"]');
+                const dataCat1Inputs = document.querySelectorAll('input[name="dataCat1"]');
+                const dataCat2Inputs = document.querySelectorAll('input[name="dataCat2"]');
+                const dataCat3Inputs = document.querySelectorAll('input[name="dataCat3"]');
+                const riskInputs = document.querySelectorAll('input[name="risk"]');
+                const timeInput = document.getElementById('timeInput');
+                const problemsError = document.getElementById('problemsError');
+                const riskError = document.getElementById('riskError');
+                const timeError = document.getElementById('timeError');
+                const steps = document.querySelectorAll('.step');
+
+                if (!encounterTypeSelect || !visitTypeSelect || !timeInput || !problemsError || !riskError || !timeError) {
+                    throw new Error('Required elements for reset not found');
+                }
+
+                encounterTypeSelect.value = 'inpatient';
+                visitTypeSelect.value = '';
+                problemsInputs.forEach(input => input.checked = false);
+                dataCat1Inputs.forEach(input => input.checked = false);
+                dataCat2Inputs.forEach(input => input.checked = false);
+                dataCat3Inputs.forEach(input => input.checked = false);
+                riskInputs.forEach(input => input.checked = false);
+                timeInput.value = '';
+                problemsError.style.display = 'none';
+                riskError.style.display = 'none';
+                timeError.style.display = 'none';
+                steps.forEach(step => step.classList.add('hidden'));
+                const step1 = document.getElementById('step1');
+                if (step1) step1.classList.remove('hidden');
+                updateVisitTypeOptions();
+                console.log('Reset completed');
+            } catch (error) {
+                console.error('Error in reset:', error);
+            }
+        }
+
+        // Initialize event listeners after DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            try {
+                console.log('DOM loaded, initializing event listeners');
+                // Ensure all steps except Step 1 are hidden on load
+                const steps = document.querySelectorAll('.step');
+                steps.forEach(step => step.classList.add('hidden'));
+                const step1 = document.getElementById('step1');
+                if (step1) step1.classList.remove('hidden');
+                currentStep = 1;
+
+                updateVisitTypeOptions();
+
+                // Attach event listeners
+                const encounterType = document.getElementById('encounterType');
+                const nextStep1 = document.getElementById('nextStep1');
+                const nextStep2 = document.getElementById('nextStep2');
+                const nextStep3 = document.getElementById('nextStep3');
+                const nextStep4 = document.getElementById('nextStep4');
+                const nextStep5 = document.getElementById('nextStep5');
+                const prevStep2 = document.getElementById('prevStep2');
+                const prevStep3 = document.getElementById('prevStep3');
+                const prevStep4 = document.getElementById('prevStep4');
+                const prevStep5 = document.getElementById('prevStep5');
+                const prevStep6 = document.getElementById('prevStep6');
+                const calculateLevelBtn = document.getElementById('calculateLevelBtn');
+                const resetBtn = document.getElementById('resetBtn');
+
+                if (!encounterType || !nextStep1 || !nextStep2 || !nextStep3 || !nextStep4 || !nextStep5 ||
+                    !prevStep2 || !prevStep3 || !prevStep4 || !prevStep5 || !prevStep6 || !calculateLevelBtn || !resetBtn) {
+                    throw new Error('One or more button elements not found');
+                }
+
+                encounterType.addEventListener('change', updateVisitTypeOptions);
+                nextStep1.addEventListener('click', () => nextStep(1));
+                nextStep2.addEventListener('click', () => nextStep(2));
+                nextStep3.addEventListener('click', () => nextStep(3));
+                nextStep4.addEventListener('click', () => nextStep(4));
+                nextStep5.addEventListener('click', () => nextStep(5));
+                prevStep2.addEventListener('click', () => prevStep(2));
+                prevStep3.addEventListener('click', () => prevStep(3));
+                prevStep4.addEventListener('click', () => prevStep(4));
+                prevStep5.addEventListener('click', () => prevStep(5));
+                prevStep6.addEventListener('click', () => prevStep(6));
+                calculateLevelBtn.addEventListener('click', calculateLevel);
+                resetBtn.addEventListener('click', reset);
+                console.log('Event listeners initialized');
+            } catch (error) {
+                console.error('Error initializing event listeners:', error);
+            }
+        });
+    </script>
+</body>
+</html>
